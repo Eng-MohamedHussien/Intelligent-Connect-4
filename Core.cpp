@@ -15,6 +15,9 @@ int countDiagonally_45Aft(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45Bef(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45Aft(int** board,int xIndex,int yIndex,int val);
 int heurstic(int** board);
+void Start_New_Game(int** board);
+void check_input();
+void Game(int** board);
 int main()
 {
     //board is arranged top down from row 0 to row 5
@@ -43,6 +46,9 @@ int main()
     std::cout<<"winner is "<<winner<<std::endl;
     std::cout<<"by connecting four "<<method<<std::endl;*/
     std::cout<<"output of our utility function : "<<heurstic(connect4Board)<<std::endl;
+    //interface
+    std::cout<<"Welcome To Connect 4 Game"<<std::endl;
+	Start_New_Game(connect4Board);
     return 0;
 }
 
@@ -352,4 +358,94 @@ int heurstic(int** board)
         }
     }
     return score;
+}
+
+
+
+void check_input()
+{
+	int inp;
+	std::cin>>inp;
+	while (true)
+	{
+		if(std::cin.fail())
+		{
+			std::cout << "Wrong value,Enter a number between 1 and 7, Try again" << std::endl << "Your move : ";
+			std::cin.clear();
+			std::cin.ignore(256,'\n');
+			std::cin >> inp;
+		}
+		else if (inp<1 || inp>7)
+		{
+			std::cout << "Wrong value,Enter a number between 1 and 7, Try again" << std::endl << "Your move : ";
+			std::cin.clear();
+			std::cin.ignore(256,'\n');
+			std::cin >> inp;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+}
+
+void Start_New_Game(int** board)
+{
+	while (true)
+	{
+		std::cout<<"press N to start new game or Q to quit"<<std::endl;
+		std::string np;
+		std::cin>>np;
+		if (np=="N" || np=="n")
+		{
+			while (true)
+			{
+				std::cout<<"Would you like to start first ? y/n"<<std::endl;
+				std::string yn;
+				std::cin>>yn;
+				if (yn=="Y"|| yn=="y")
+				{
+					std::cout<<"Your move : ";
+					check_input();
+					// Modify Board
+					break;
+				}
+				else if (yn=="N" || yn=="n")
+				{
+					break;
+				}
+				else
+				{
+					std::cout<<"Wrong input, Try again"<<std::endl;
+				}
+			}
+			//Start game here
+			Game(board);
+		}
+		else if (np=="Q" || np=="q")
+		{
+			std::cout<<"Thank you for Playing" << std::endl;
+			break;
+		}
+		else
+		{
+			std::cout<<"Wrong value, Try again" << std::endl;
+		}
+	}
+}
+
+void Game(int** board)
+{
+	while (true)
+	{
+		std::cout<<"My move : ";
+		// Call Algorithm
+		// Modify Board
+		// Check Winning state 
+		std::cout<<"Your move : ";
+		check_input();
+		// Modify Board
+		// Check Winning State
+	}
 }
