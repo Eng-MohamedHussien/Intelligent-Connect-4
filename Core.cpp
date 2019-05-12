@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-void modifyBoard(int** board,int xIndex,int yIndex,std::string playerMode);
+void modifyBoard(int** board,int yIndex,std::string playerMode,int** result);
 void evaluateBoard(int** board,std::string& winner,std::string& how);
 int countHorizontally(int** board,int xIndex,int yIndex,int val);
 int countVertically(int** board,int xIndex,int yIndex,int val);
@@ -22,48 +22,72 @@ int main()
     {
         connect4Board[i] = new int[7];
     }
-    //modifyBoard(connect4Board,5,3,"user");
-    //std::cout<<connect4Board[5][3]<<std::endl;
-    //modifyBoard(connect4Board,0,7,"user");
-    //std::cout<<connect4Board[0][7]<<std::endl;
     connect4Board[0] = new int[7] {0,0,0,0,0,0,0};
     connect4Board[1] = new int[7] {0,0,0,1,0,0,0};
     connect4Board[2] = new int[7] {0,0,-1,-1,0,0,0};
     connect4Board[3] = new int[7] {0,0,-1,-1,0,0,0};
     connect4Board[4] = new int[7] {1,1,1,-1,-1,1,0};
     connect4Board[5] = new int[7] {-1,-1,1,1,1,-1,0};
-    /*for(int i=0;i<6;i++)
+    int** result = new int* [6];
+    for(int i=0;i<6;i++)
     {
-        std::cout<<"index "<<i<<std::endl;
+        result[i] = new int[7];
+    }
+    modifyBoard(connect4Board,3,"them",result);
+    for(int i=0;i<6;i++)
+    {
         for(int j=0;j<7;j++)
         {
-            std::cout<<connect4Board[i][j]<<std::endl;
+            std::cout<<result[i][j]<<" ";
         }
-    }*/
-    //std::cout<<countDiagonally_45(connect4Board,2,2,-1)<<std::endl;
+        std::cout<<std::endl;
+    }
+    /*
     std::string winner,method;
     evaluateBoard(connect4Board,winner,method);
     std::cout<<"winner is "<<winner<<std::endl;
-    std::cout<<"by connecting four "<<method<<std::endl;
+    std::cout<<"by connecting four "<<method<<std::endl;*/
     return 0;
 }
 
-//i will assume that player's game will be 1 in his chosen position and -1 for our algorithm
-void modifyBoard(int** board,int xIndex,int yIndex,std::string playerMode)
+//i will assume that player's game will be -1 in his chosen position and 1 for our algorithm yIndex is column number
+void modifyBoard(int** board,int yIndex,std::string playerMode,int** result)
 {
-    if(playerMode == "user")
+    //board is arranged top down from row 0 to row 5
+    for(int i=0;i<6;i++)
     {
-        if(xIndex >= 0&&xIndex <=5&&yIndex>=0&&yIndex<=6)
+        for(int j=0;j<7;j++)
         {
-            board[xIndex][yIndex] = 1;
-        }else
+            result[i][j] = board[i][j];
+        }
+    }
+    if(playerMode == "us")
+    {
+        if(yIndex > 0&&yIndex <7)
         {
-            std::cout<<"invalid index"<<std::endl;
+            for(int i=5;i>=0;i--)
+            {
+                if(result[i][yIndex] == 0)
+                {
+                    result[i][yIndex] = 1;
+                    break;
+                }
+            }  
         }
         
-    }else if(playerMode == "Computer")
+    }else if(playerMode == "them")
     {
-        board[xIndex][yIndex] = -1;
+        if(yIndex > 0&&yIndex <7)
+        {
+            for(int i=5;i>=0;i--)
+            {
+                if(result[i][yIndex] == 0)
+                {
+                    result[i][yIndex] = -1;
+                    break;
+                }
+            }  
+        }
     }
 }
 //it will evaluate board and tell us who wins and how he won method (connecting 4 horizontally,...etc)
