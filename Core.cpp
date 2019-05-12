@@ -14,6 +14,7 @@ int countDiagonally_45Bef(int** board,int xIndex,int yIndex,int val);
 int countDiagonally_45Aft(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45Bef(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45Aft(int** board,int xIndex,int yIndex,int val);
+int heurstic(int** board);
 int main()
 {
     //board is arranged top down from row 0 to row 5
@@ -23,22 +24,16 @@ int main()
         connect4Board[i] = new int[7];
     }
     connect4Board[0] = new int[7] {0,0,0,0,0,0,0};
-    connect4Board[1] = new int[7] {0,0,0,1,0,0,0};
-    connect4Board[2] = new int[7] {0,0,-1,-1,0,0,0};
-    connect4Board[3] = new int[7] {0,0,-1,-1,0,0,0};
-    connect4Board[4] = new int[7] {1,1,1,-1,-1,1,0};
-    connect4Board[5] = new int[7] {-1,-1,1,1,1,-1,0};
-    int** result = new int* [6];
-    for(int i=0;i<6;i++)
-    {
-        result[i] = new int[7];
-    }
-    modifyBoard(connect4Board,3,"them",result);
+    connect4Board[1] = new int[7] {0,0,0,0,0,0,0};
+    connect4Board[2] = new int[7] {0,0,0,0,1,0,0};
+    connect4Board[3] = new int[7] {0,0,0,-1,1,0,0};
+    connect4Board[4] = new int[7] {0,0,0,-1,1,-1,0};
+    connect4Board[5] = new int[7] {0,0,-1,1,1,1,-1};
     for(int i=0;i<6;i++)
     {
         for(int j=0;j<7;j++)
         {
-            std::cout<<result[i][j]<<" ";
+            std::cout<<connect4Board[i][j]<<" ";
         }
         std::cout<<std::endl;
     }
@@ -47,6 +42,7 @@ int main()
     evaluateBoard(connect4Board,winner,method);
     std::cout<<"winner is "<<winner<<std::endl;
     std::cout<<"by connecting four "<<method<<std::endl;*/
+    std::cout<<"output of our utility function : "<<heurstic(connect4Board)<<std::endl;
     return 0;
 }
 
@@ -63,7 +59,7 @@ void modifyBoard(int** board,int yIndex,std::string playerMode,int** result)
     }
     if(playerMode == "us")
     {
-        if(yIndex > 0&&yIndex <7)
+        if(yIndex >= 0&&yIndex < 7)
         {
             for(int i=5;i>=0;i--)
             {
@@ -77,7 +73,7 @@ void modifyBoard(int** board,int yIndex,std::string playerMode,int** result)
         
     }else if(playerMode == "them")
     {
-        if(yIndex > 0&&yIndex <7)
+        if(yIndex >= 0&&yIndex < 7)
         {
             for(int i=5;i>=0;i--)
             {
@@ -248,4 +244,112 @@ int countDiagonally_45Aft(int** board,int xIndex,int yIndex,int val)
         return 0;
     }
     return 1 + countDiagonally_45Aft(board,xIndex+1,yIndex+1,val);
+}
+
+int heurstic(int** board)
+{
+    int score = 0;
+    int horz , vert , dia45 , dia_45;
+    for(int i = 5;i >= 0;i--)
+    {
+        for(int j = 0;j < 7;j++)
+        {
+            horz = 0 , vert = 0 , dia45 = 0 , dia_45 = 0;
+            if(board[i][j] == 1)
+            {
+                horz = countHorizontally(board,i,j,1);
+                vert = countVertically(board,i,j,1);
+                dia45 = countDiagonally45(board,i,j,1);
+                dia_45 = countDiagonally_45(board,i,j,1);
+                if(horz == 2)
+                {
+                    score += 25;
+                }else if(horz == 3)
+                {
+                    score += 50;
+                }else if(horz == 4)
+                {
+                    score += 1000000;
+                }
+                if(vert == 2)
+                {
+                    score += 25;
+                }else if(vert == 3)
+                {
+                    score += 50;
+                }else if(vert == 4)
+                {
+                    score += 1000000;
+                }
+                if(dia_45 == 2)
+                {
+                    score += 25;
+                }else if(dia_45 == 3)
+                {
+                    score += 50;
+                }else if(dia_45 == 4)
+                {
+                    score += 1000000;
+                }
+                if(dia45 == 2)
+                {
+                    score += 25;
+                }else if(dia45 == 3)
+                {
+                    score += 50;
+                }else if(dia45 == 4)
+                {
+                    score += 1000000;
+                }
+
+            }else if(board[i][j] == -1)
+            {
+                horz = countHorizontally(board,i,j,-1);
+                vert = countVertically(board,i,j,-1);
+                dia45 = countDiagonally45(board,i,j,-1);
+                dia_45 = countDiagonally_45(board,i,j,-1);
+                if(horz == 2)
+                {
+                    score -= 25;
+                }else if(horz == 3)
+                {
+                    score -= 50;
+                }else if(horz == 4)
+                {
+                    score -= 1000000;
+                }
+                if(vert == 2)
+                {
+                    score -= 25;
+                }else if(vert == 3)
+                {
+                    score -= 50;
+                }else if(vert == 4)
+                {
+                    score -= 1000000;
+                }
+                if(dia_45 == 2)
+                {
+                    score -= 25;
+                }else if(dia_45 == 3)
+                {
+                    score -= 50;
+                }else if(dia_45 == 4)
+                {
+                    score -= 1000000;
+                }
+                if(dia45 == 2)
+                {
+                    score -= 25;
+                }else if(dia45 == 3)
+                {
+                    score -= 50;
+                }else if(dia45 == 4)
+                {
+                    score -= 1000000;
+                }
+            }
+        }
+    }
+    return score;
 }
