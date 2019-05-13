@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
-void modifyBoard(int** board,int yIndex,std::string playerMode,int** result);
+#include <list>
+int** modifyBoard(int** board,int yIndex,std::string playerMode);
 void evaluateBoard(int** board,std::string& winner,std::string& how);
 int countHorizontally(int** board,int xIndex,int yIndex,int val);
 int countVertically(int** board,int xIndex,int yIndex,int val);
@@ -18,6 +19,7 @@ int heurstic(int** board);
 void Start_New_Game(int** board);
 void check_input();
 void Game(int** board);
+int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,int beta);
 int main()
 {
     //board is arranged top down from row 0 to row 5
@@ -28,33 +30,42 @@ int main()
     }
     connect4Board[0] = new int[7] {0,0,0,0,0,0,0};
     connect4Board[1] = new int[7] {0,0,0,0,0,0,0};
-    connect4Board[2] = new int[7] {0,0,0,0,1,0,0};
-    connect4Board[3] = new int[7] {0,0,0,-1,1,0,0};
-    connect4Board[4] = new int[7] {0,0,0,-1,1,-1,0};
-    connect4Board[5] = new int[7] {0,0,-1,1,1,1,-1};
+    connect4Board[2] = new int[7] {0,0,0,0,0,0,0};
+    connect4Board[3] = new int[7] {0,0,0,0,0,0,0};
+    connect4Board[4] = new int[7] {0,0,0,-1,-1,0,0};
+    connect4Board[5] = new int[7] {0,0,-1,1,1,1,0};
+    int** result;
+    int i = minMaxWithAlphaBeta(connect4Board,3,0,-100000000,100000000);
+    std::cout<<"out is "<<i<<std::endl;
+    result = modifyBoard(connect4Board,i,"us");
     for(int i=0;i<6;i++)
     {
         for(int j=0;j<7;j++)
         {
-            std::cout<<connect4Board[i][j]<<" ";
+            std::cout<<result[i][j]<<" ";
         }
         std::cout<<std::endl;
     }
-    /*
     std::string winner,method;
-    evaluateBoard(connect4Board,winner,method);
+    evaluateBoard(result,winner,method);
     std::cout<<"winner is "<<winner<<std::endl;
-    std::cout<<"by connecting four "<<method<<std::endl;*/
-    std::cout<<"output of our utility function : "<<heurstic(connect4Board)<<std::endl;
+    std::cout<<"by connecting four "<<method<<std::endl;
+    //std::cout<<"output of our utility function : "<<heurstic(connect4Board)<<std::endl;
+    /*
     //interface
     std::cout<<"Welcome To Connect 4 Game"<<std::endl;
-	Start_New_Game(connect4Board);
+	Start_New_Game(connect4Board);*/
     return 0;
 }
 
 //i will assume that player's game will be -1 in his chosen position and 1 for our algorithm yIndex is column number
-void modifyBoard(int** board,int yIndex,std::string playerMode,int** result)
+int** modifyBoard(int** board,int yIndex,std::string playerMode)
 {
+    int** result = new int* [6];
+    for(int i=0;i<6;i++)
+    {
+        result[i] = new int[7];
+    }
     //board is arranged top down from row 0 to row 5
     for(int i=0;i<6;i++)
     {
@@ -72,7 +83,7 @@ void modifyBoard(int** board,int yIndex,std::string playerMode,int** result)
                 if(result[i][yIndex] == 0)
                 {
                     result[i][yIndex] = 1;
-                    break;
+                    return result;
                 }
             }  
         }
@@ -86,7 +97,7 @@ void modifyBoard(int** board,int yIndex,std::string playerMode,int** result)
                 if(result[i][yIndex] == 0)
                 {
                     result[i][yIndex] = -1;
-                    break;
+                    return result;
                 }
             }  
         }
@@ -126,7 +137,7 @@ void evaluateBoard(int** board,std::string& winner,std::string& how)
                 }
                 if(how != "")
                 {
-                    winner = "user";
+                    winner = "computer";
                     flag = true;
                     break;
                 }
@@ -151,7 +162,7 @@ void evaluateBoard(int** board,std::string& winner,std::string& how)
                 }
                 if(how != "")
                 {
-                    winner = "Computer";
+                    winner = "user";
                     flag = true;
                     break;
                 }
@@ -448,4 +459,252 @@ void Game(int** board)
 		// Modify Board
 		// Check Winning State
 	}
+}
+
+int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,int beta)
+{
+    int score1,score2,score3,score4,score5,score6,score7;
+    int nextStateIndex;
+    if(depth == 0)
+    {
+        return heurstic(currentState);
+    }
+    if(depth%2 == 1)
+    {
+        if(alpha < beta)
+        {
+            score1 = minMaxWithAlphaBeta(modifyBoard(currentState,0,"us"),depth-1,0,alpha,beta);
+            if(depth > 1)
+            {
+                if(score1 > alpha)
+                {
+                    if(depth == 3)
+                    {
+                        nextStateIndex = 0;
+                    }
+                    alpha = score1;
+                }
+            }else
+            {
+                if(score1 > alpha)
+                {
+                    alpha = score1;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score2 = minMaxWithAlphaBeta(modifyBoard(currentState,1,"us"),depth-1,1,alpha,beta);
+            if(depth > 1)
+            {
+                if(score2 > alpha)
+                {
+                    if(depth == 3)
+                    {
+                        nextStateIndex = 1;
+                    }
+                    alpha = score2;
+                }
+            }else
+            {
+                if(score2 > alpha)
+                {
+                    alpha = score2;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score3 = minMaxWithAlphaBeta(modifyBoard(currentState,2,"us"),depth-1,2,alpha,beta);
+            if(depth > 1)
+            {
+                if(score3 > alpha)
+                {
+                    if(depth == 3)
+                    {
+                        nextStateIndex = 2;
+                    }
+                    alpha = score3;
+                }
+            }else
+            {
+                if(score3 > alpha)
+                {
+                    alpha = score3;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score4 = minMaxWithAlphaBeta(modifyBoard(currentState,3,"us"),depth-1,3,alpha,beta);
+            if(depth > 1)
+            {
+                if(score4 > alpha)
+                {
+                    if(depth == 3)
+                    {
+                        nextStateIndex = 3;
+                    }
+                    alpha = score4;
+                }
+            }else
+            {
+                if(score4 > alpha)
+                {
+                    alpha = score4;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score5 = minMaxWithAlphaBeta(modifyBoard(currentState,4,"us"),depth-1,4,alpha,beta);
+            if(depth > 1)
+            {
+                if(score5 > alpha)
+                {
+                    if(depth == 3)
+                    {
+                        nextStateIndex = 4;
+                    }
+                    alpha = score5;
+                }
+            }else
+            {
+                if(score5 > alpha)
+                {
+                    alpha = score5;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score6 = minMaxWithAlphaBeta(modifyBoard(currentState,5,"us"),depth-1,5,alpha,beta);
+            if(depth > 1)
+            {
+                if(score6 > alpha)
+                {
+                    if(depth == 3)
+                    {
+                        nextStateIndex = 5;
+                    }
+                    alpha = score6;
+                }
+            }else
+            {
+                if(score6 > alpha)
+                {
+                    alpha = score6;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score7 = minMaxWithAlphaBeta(modifyBoard(currentState,6,"us"),depth-1,6,alpha,beta);
+            if(depth > 1)
+            {
+                if(score7 > alpha)
+                {
+                    if(depth == 3)
+                    {
+                        nextStateIndex = 6;
+                    }
+                    alpha = score7;
+                }
+            }else
+            {
+                if(score7 > alpha)
+                {
+                    alpha = score7;
+                }
+            }
+        }
+        if(depth == 3)
+        {
+            return nextStateIndex;
+        }else
+        {
+            return std::min(alpha,beta);
+        }
+    }
+    else
+    {
+        if(alpha < beta)
+        {
+            score1 = minMaxWithAlphaBeta(modifyBoard(currentState,0,"them"),depth-1,0,alpha,beta);
+            if(depth > 1)
+            {
+                if(score1 < beta)
+                {
+                    beta = score1;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score2 = minMaxWithAlphaBeta(modifyBoard(currentState,1,"them"),depth-1,1,alpha,beta);
+            if(depth > 1)
+            {
+                if(score2 < beta)
+                {
+                    beta = score2;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score3 = minMaxWithAlphaBeta(modifyBoard(currentState,2,"them"),depth-1,2,alpha,beta);
+            if(depth > 1)
+            {
+                if(score3 < beta)
+                {
+                    beta = score3;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score4 = minMaxWithAlphaBeta(modifyBoard(currentState,3,"them"),depth-1,3,alpha,beta);
+            if(depth > 1)
+            {
+                if(score4 < beta)
+                {
+                    beta = score4;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score5 = minMaxWithAlphaBeta(modifyBoard(currentState,4,"them"),depth-1,4,alpha,beta);
+            if(depth > 1)
+            {
+                if(score5 < beta)
+                {
+                    beta = score5;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score6 = minMaxWithAlphaBeta(modifyBoard(currentState,5,"them"),depth-1,5,alpha,beta);
+            if(depth > 1)
+            {
+                if(score6 < beta)
+                {
+                    beta = score6;
+                }
+            }
+        }
+        if(alpha < beta)
+        {
+            score7 = minMaxWithAlphaBeta(modifyBoard(currentState,6,"them"),depth-1,6,alpha,beta);
+            if(depth > 1)
+            {
+                if(score7 < beta)
+                {
+                    beta = score7;
+                }
+            }
+        }
+        return std::max(alpha,beta);
+    }
 }
