@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <time.h>
 int** modifyBoard(int** board,int yIndex,std::string playerMode);
 void evaluateBoard(int** board,std::string& winner,std::string& how);
 int countHorizontally(int** board,int xIndex,int yIndex,int val);
@@ -19,6 +20,7 @@ void Start_New_Game(int** board);
 void check_input();
 void Game(int** board);
 int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,int beta);
+#define maxDepth 3
 int main()
 {
     //board is arranged top down from row 0 to row 5
@@ -34,7 +36,9 @@ int main()
     connect4Board[4] = new int[7] {0,0,0,-1,-1,0,0};
     connect4Board[5] = new int[7] {0,0,-1,1,1,1,0};
     int** result;
+    clock_t tStart = clock();
     int i = minMaxWithAlphaBeta(connect4Board,3,0,-100000000,100000000);
+    printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
     std::cout<<"out is "<<i<<std::endl;
     result = modifyBoard(connect4Board,i,"us");
     for(int i=0;i<6;i++)
@@ -477,7 +481,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
             {
                 if(score1 > alpha)
                 {
-                    if(depth == 3)
+                    if(depth == maxDepth)
                     {
                         nextStateIndex = 0;
                     }
@@ -498,7 +502,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
             {
                 if(score2 > alpha)
                 {
-                    if(depth == 3)
+                    if(depth == maxDepth)
                     {
                         nextStateIndex = 1;
                     }
@@ -519,7 +523,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
             {
                 if(score3 > alpha)
                 {
-                    if(depth == 3)
+                    if(depth == maxDepth)
                     {
                         nextStateIndex = 2;
                     }
@@ -540,7 +544,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
             {
                 if(score4 > alpha)
                 {
-                    if(depth == 3)
+                    if(depth == maxDepth)
                     {
                         nextStateIndex = 3;
                     }
@@ -561,7 +565,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
             {
                 if(score5 > alpha)
                 {
-                    if(depth == 3)
+                    if(depth == maxDepth)
                     {
                         nextStateIndex = 4;
                     }
@@ -582,7 +586,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
             {
                 if(score6 > alpha)
                 {
-                    if(depth == 3)
+                    if(depth == maxDepth)
                     {
                         nextStateIndex = 5;
                     }
@@ -603,7 +607,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
             {
                 if(score7 > alpha)
                 {
-                    if(depth == 3)
+                    if(depth == maxDepth)
                     {
                         nextStateIndex = 6;
                     }
@@ -617,7 +621,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(depth == 3)
+        if(depth == maxDepth)
         {
             return nextStateIndex;
         }else
