@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <list>
 int** modifyBoard(int** board,int yIndex,std::string playerMode);
 void evaluateBoard(int** board,std::string& winner,std::string& how);
 int countHorizontally(int** board,int xIndex,int yIndex,int val);
