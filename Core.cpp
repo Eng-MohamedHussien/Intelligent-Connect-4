@@ -408,6 +408,7 @@ void StartNewGame()
 					std::cout<<"Your move : ";
 					int y1 = check_input();
 					board=modifyBoard(board,y1,"them");
+					showBoard(board);
 					break;
 				}
 				else if (yn=="N" || yn=="n")
@@ -430,6 +431,7 @@ void StartNewGame()
 			std::cout<<"Your move : ";
 			int y1 = check_input();
 			lastboard=modifyBoard(lastboard,y1,"them");
+			showBoard(lastboard);
 			Game(lastboard);
 		}
 		else if (np=="Q" || np=="q")
