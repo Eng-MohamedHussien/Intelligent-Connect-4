@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
-#include <time.h>
+#define maxDepth 3
 int** modifyBoard(int** board,int yIndex,std::string playerMode);
-void evaluateBoard(int** board,std::string& winner,std::string& how);
+bool evaluateBoard(int** board,std::string& winner,std::string& how);
 int countHorizontally(int** board,int xIndex,int yIndex,int val);
 int countVertically(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45(int** board,int xIndex,int yIndex,int val);
@@ -16,48 +16,33 @@ int countDiagonally_45Aft(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45Bef(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45Aft(int** board,int xIndex,int yIndex,int val);
 int heurstic(int** board);
-void Start_New_Game(int** board);
-void check_input();
+void StartNewGame(int** board);
+int check_input();
 void Game(int** board);
 int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,int beta);
-#define maxDepth 3
+void showBoard(int** board);
+bool validModification(int** board,int y);
 int main()
 {
     //board is arranged top down from row 0 to row 5
     int** connect4Board = new int* [6];
     for(int i=0;i<6;i++)
-    {
-        connect4Board[i] = new int[7];
-    }
-    connect4Board[0] = new int[7] {0,0,0,0,0,0,0};
-    connect4Board[1] = new int[7] {0,0,0,0,0,0,0};
-    connect4Board[2] = new int[7] {0,0,0,0,0,0,0};
-    connect4Board[3] = new int[7] {0,0,0,0,0,0,0};
-    connect4Board[4] = new int[7] {0,0,0,-1,-1,0,0};
-    connect4Board[5] = new int[7] {0,0,-1,1,1,1,0};
-    int** result;
-    clock_t tStart = clock();
-    int i = minMaxWithAlphaBeta(connect4Board,3,0,-100000000,100000000);
-    printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
-    std::cout<<"out is "<<i<<std::endl;
-    result = modifyBoard(connect4Board,i,"us");
-    for(int i=0;i<6;i++)
-    {
-        for(int j=0;j<7;j++)
-        {
-            std::cout<<result[i][j]<<" ";
-        }
-        std::cout<<std::endl;
-    }
-    std::string winner,method;
-    evaluateBoard(result,winner,method);
-    std::cout<<"winner is "<<winner<<std::endl;
-    std::cout<<"by connecting four "<<method<<std::endl;
-    //std::cout<<"output of our utility function : "<<heurstic(connect4Board)<<std::endl;
-    /*
+	{
+		connect4Board[i] = new int[7];
+	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < 7; j++)
+		{
+			connect4Board[i][j]=0;
+		}
+	}
+
+  
     //interface
     std::cout<<"Welcome To Connect 4 Game"<<std::endl;
-	Start_New_Game(connect4Board);*/
+    StartNewGame(connect4Board);
     return 0;
 }
 
@@ -107,7 +92,7 @@ int** modifyBoard(int** board,int yIndex,std::string playerMode)
     }
 }
 //it will evaluate board and tell us who wins and how he won method (connecting 4 horizontally,...etc)
-void evaluateBoard(int** board,std::string& winner,std::string& how)
+bool evaluateBoard(int** board,std::string& winner,std::string& how)
 {
     winner = "";
     how = "";
@@ -171,6 +156,13 @@ void evaluateBoard(int** board,std::string& winner,std::string& how)
                 }
             }        
         }
+    }
+    if(winner == "")
+    {
+        return false;
+    }else
+    {
+        return true;
     }
 }
 
@@ -289,7 +281,7 @@ int heurstic(int** board)
                     score += 50;
                 }else if(horz == 4)
                 {
-                    score += 1000000;
+                    score += 10000;
                 }
                 if(vert == 2)
                 {
@@ -299,7 +291,7 @@ int heurstic(int** board)
                     score += 50;
                 }else if(vert == 4)
                 {
-                    score += 1000000;
+                    score += 10000;
                 }
                 if(dia_45 == 2)
                 {
@@ -309,7 +301,7 @@ int heurstic(int** board)
                     score += 50;
                 }else if(dia_45 == 4)
                 {
-                    score += 1000000;
+                    score += 10000;
                 }
                 if(dia45 == 2)
                 {
@@ -319,7 +311,7 @@ int heurstic(int** board)
                     score += 50;
                 }else if(dia45 == 4)
                 {
-                    score += 1000000;
+                    score += 10000;
                 }
 
             }else if(board[i][j] == -1)
@@ -376,7 +368,7 @@ int heurstic(int** board)
 
 
 
-void check_input()
+int check_input()
 {
 	int inp;
 	std::cin>>inp;
@@ -401,10 +393,11 @@ void check_input()
 			break;
 		}
 	}
+	return inp-1;
 
 }
 
-void Start_New_Game(int** board)
+void StartNewGame(int** board)
 {
 	while (true)
 	{
@@ -421,8 +414,8 @@ void Start_New_Game(int** board)
 				if (yn=="Y"|| yn=="y")
 				{
 					std::cout<<"Your move : ";
-					check_input();
-					// Modify Board
+					int y1 = check_input();
+					board=modifyBoard(board,y1,"them");
 					break;
 				}
 				else if (yn=="N" || yn=="n")
@@ -451,17 +444,36 @@ void Start_New_Game(int** board)
 
 void Game(int** board)
 {
+	std::string winner,method;
+    bool flag = false;
 	while (true)
 	{
 		std::cout<<"My move : ";
-		// Call Algorithm
-		// Modify Board
-		// Check Winning state 
+		int x1 = minMaxWithAlphaBeta(board,maxDepth,0,-100000000,100000000);
+		std::cout<<x1+1<<std::endl;
+		board=modifyBoard(board,x1,"us");
+		showBoard(board);
+		// Check Winning state
+        if(evaluateBoard(board,winner,method))
+        {
+            flag = true; 
+            break;
+        } 
 		std::cout<<"Your move : ";
-		check_input();
-		// Modify Board
+		int y1 = check_input();
+		board=modifyBoard(board,y1,"them");
+		showBoard(board);
 		// Check Winning State
+        if(evaluateBoard(board,winner,method))
+        {
+            flag = true; 
+            break;
+        } 
 	}
+    if(flag)
+    {
+        std::cout<<"Winner is "+winner+" by connecting 4 "+method<<std::endl;
+    }
 }
 
 int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,int beta)
@@ -474,7 +486,8 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
     }
     if(depth%2 == 1)
     {
-        if(alpha < beta)
+        //std::cout<<depth<<"  0"<<std::endl;
+        if(alpha < beta && validModification(currentState,0))
         {
             score1 = minMaxWithAlphaBeta(modifyBoard(currentState,0,"us"),depth-1,0,alpha,beta);
             if(depth > 1)
@@ -487,6 +500,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                     }
                     alpha = score1;
                 }
+                //std::cout<<alpha<<" "<<beta<<std::endl;
             }else
             {
                 if(score1 > alpha)
@@ -495,7 +509,8 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        //std::cout<<depth<<"  1"<<std::endl;
+        if(alpha < beta && validModification(currentState,1))
         {
             score2 = minMaxWithAlphaBeta(modifyBoard(currentState,1,"us"),depth-1,1,alpha,beta);
             if(depth > 1)
@@ -508,6 +523,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                     }
                     alpha = score2;
                 }
+                //std::cout<<alpha<<" "<<beta<<std::endl;
             }else
             {
                 if(score2 > alpha)
@@ -516,19 +532,21 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        //std::cout<<depth<<"  2"<<std::endl;
+        if(alpha < beta && validModification(currentState,2))
         {
             score3 = minMaxWithAlphaBeta(modifyBoard(currentState,2,"us"),depth-1,2,alpha,beta);
             if(depth > 1)
             {
-                if(score3 > alpha)
+                if(score3 > maxDepth)
                 {
-                    if(depth == maxDepth)
+                    if(depth == 3)
                     {
                         nextStateIndex = 2;
                     }
                     alpha = score3;
                 }
+                //std::cout<<alpha<<" "<<beta<<std::endl;
             }else
             {
                 if(score3 > alpha)
@@ -537,7 +555,8 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        //std::cout<<depth<<"  3"<<std::endl;
+        if(alpha < beta && validModification(currentState,3))
         {
             score4 = minMaxWithAlphaBeta(modifyBoard(currentState,3,"us"),depth-1,3,alpha,beta);
             if(depth > 1)
@@ -550,6 +569,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                     }
                     alpha = score4;
                 }
+                //std::cout<<alpha<<" "<<beta<<std::endl;
             }else
             {
                 if(score4 > alpha)
@@ -558,7 +578,8 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        //std::cout<<depth<<"  4"<<std::endl;
+        if(alpha < beta && validModification(currentState,4))
         {
             score5 = minMaxWithAlphaBeta(modifyBoard(currentState,4,"us"),depth-1,4,alpha,beta);
             if(depth > 1)
@@ -571,6 +592,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                     }
                     alpha = score5;
                 }
+                //std::cout<<alpha<<" "<<beta<<std::endl;
             }else
             {
                 if(score5 > alpha)
@@ -579,7 +601,8 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        //std::cout<<depth<<"  5"<<std::endl;
+        if(alpha < beta && validModification(currentState,5))
         {
             score6 = minMaxWithAlphaBeta(modifyBoard(currentState,5,"us"),depth-1,5,alpha,beta);
             if(depth > 1)
@@ -592,6 +615,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                     }
                     alpha = score6;
                 }
+                //std::cout<<alpha<<" "<<beta<<std::endl;
             }else
             {
                 if(score6 > alpha)
@@ -600,7 +624,8 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        //std::cout<<depth<<"  6"<<std::endl;
+        if(alpha < beta && validModification(currentState,6))
         {
             score7 = minMaxWithAlphaBeta(modifyBoard(currentState,6,"us"),depth-1,6,alpha,beta);
             if(depth > 1)
@@ -613,6 +638,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                     }
                     alpha = score7;
                 }
+                //std::cout<<alpha<<" "<<beta<<std::endl;
             }else
             {
                 if(score7 > alpha)
@@ -631,7 +657,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
     }
     else
     {
-        if(alpha < beta)
+        if(alpha < beta && validModification(currentState,0))
         {
             score1 = minMaxWithAlphaBeta(modifyBoard(currentState,0,"them"),depth-1,0,alpha,beta);
             if(depth > 1)
@@ -642,7 +668,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        if(alpha < beta && validModification(currentState,1))
         {
             score2 = minMaxWithAlphaBeta(modifyBoard(currentState,1,"them"),depth-1,1,alpha,beta);
             if(depth > 1)
@@ -653,7 +679,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        if(alpha < beta && validModification(currentState,2))
         {
             score3 = minMaxWithAlphaBeta(modifyBoard(currentState,2,"them"),depth-1,2,alpha,beta);
             if(depth > 1)
@@ -664,7 +690,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        if(alpha < beta && validModification(currentState,3))
         {
             score4 = minMaxWithAlphaBeta(modifyBoard(currentState,3,"them"),depth-1,3,alpha,beta);
             if(depth > 1)
@@ -675,7 +701,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        if(alpha < beta && validModification(currentState,4))
         {
             score5 = minMaxWithAlphaBeta(modifyBoard(currentState,4,"them"),depth-1,4,alpha,beta);
             if(depth > 1)
@@ -686,7 +712,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        if(alpha < beta && validModification(currentState,5))
         {
             score6 = minMaxWithAlphaBeta(modifyBoard(currentState,5,"them"),depth-1,5,alpha,beta);
             if(depth > 1)
@@ -697,7 +723,7 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
                 }
             }
         }
-        if(alpha < beta)
+        if(alpha < beta && validModification(currentState,6))
         {
             score7 = minMaxWithAlphaBeta(modifyBoard(currentState,6,"them"),depth-1,6,alpha,beta);
             if(depth > 1)
@@ -710,4 +736,40 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
         }
         return std::max(alpha,beta);
     }
+}
+
+
+void showBoard(int** board)
+{
+	for(int i=0;i<6;i++)
+    {
+        for(int j=0;j<7;j++)
+        {
+            if(board[i][j] == -1)
+            {
+                 std::cout<<"o ";
+            }
+            else if(board[i][j] == 1)
+            {
+                std::cout<<"x ";   
+            }
+            else
+            {
+                std::cout<<"- ";
+            }
+        }
+        std::cout<<std::endl;
+    }
+}
+
+bool validModification(int** board,int y)
+{
+    for(int i=5;i>=0;i--)
+    {
+        if(board[i][y] == 0)
+        {
+            return true;
+        }
+    }  
+    return false;
 }
