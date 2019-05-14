@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 #define maxDepth 3
 int** modifyBoard(int** board,int yIndex,std::string playerMode);
 bool evaluateBoard(int** board,std::string& winner,std::string& how);
@@ -16,33 +17,21 @@ int countDiagonally_45Aft(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45Bef(int** board,int xIndex,int yIndex,int val);
 int countDiagonally45Aft(int** board,int xIndex,int yIndex,int val);
 int heurstic(int** board);
-void StartNewGame(int** board);
+void StartNewGame();
 int check_input();
 void Game(int** board);
 int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,int beta);
 void showBoard(int** board);
 bool validModification(int** board,int y);
+int** InitiateBoard();
+void SaveGame(int** board);
+int** LoadGame();
+
 int main()
 {
-    //board is arranged top down from row 0 to row 5
-    int** connect4Board = new int* [6];
-    for(int i=0;i<6;i++)
-	{
-		connect4Board[i] = new int[7];
-	}
-
-	for (int i = 0; i < 6; i++)
-	{
-		for (int j = 0; j < 7; j++)
-		{
-			connect4Board[i][j]=0;
-		}
-	}
-
-  
     //interface
     std::cout<<"Welcome To Connect 4 Game"<<std::endl;
-    StartNewGame(connect4Board);
+	StartNewGame();
     return 0;
 }
 
@@ -366,8 +355,6 @@ int heurstic(int** board)
     return score;
 }
 
-
-
 int check_input()
 {
 	int inp;
@@ -380,6 +367,10 @@ int check_input()
 			std::cin.clear();
 			std::cin.ignore(256,'\n');
 			std::cin >> inp;
+		}
+		else if(inp == -1)
+		{
+			return inp;
 		}
 		else if (inp<1 || inp>7)
 		{
@@ -397,15 +388,16 @@ int check_input()
 
 }
 
-void StartNewGame(int** board)
+void StartNewGame()
 {
 	while (true)
 	{
-		std::cout<<"press N to start new game or Q to quit"<<std::endl;
+		std::cout<<"press N to start new game or L to load last game or Q to quit"<<std::endl;
 		std::string np;
 		std::cin>>np;
 		if (np=="N" || np=="n")
 		{
+			int** board = InitiateBoard();
 			while (true)
 			{
 				std::cout<<"Would you like to start first ? y/n"<<std::endl;
@@ -429,6 +421,16 @@ void StartNewGame(int** board)
 			}
 			//Start game here
 			Game(board);
+		}
+		else if (np=="L" || np=="l")
+		{
+			std::cout<<"Loading" << std::endl;
+			int** lastboard=LoadGame();
+			showBoard(lastboard);
+			std::cout<<"Your move : ";
+			int y1 = check_input();
+			lastboard=modifyBoard(lastboard,y1,"them");
+			Game(lastboard);
 		}
 		else if (np=="Q" || np=="q")
 		{
@@ -461,6 +463,12 @@ void Game(int** board)
         } 
 		std::cout<<"Your move : ";
 		int y1 = check_input();
+		if(y1==-1)
+		{
+			SaveGame(board);
+			std::cout<<"Game has been saved"<<std::endl;
+			break;
+		}
 		board=modifyBoard(board,y1,"them");
 		showBoard(board);
 		// Check Winning State
@@ -738,7 +746,6 @@ int minMaxWithAlphaBeta(int** currentState,int depth,int childIndex,int alpha,in
     }
 }
 
-
 void showBoard(int** board)
 {
 	for(int i=0;i<6;i++)
@@ -772,4 +779,54 @@ bool validModification(int** board,int y)
         }
     }  
     return false;
+}
+
+int** InitiateBoard()
+{
+	//board is arranged top down from row 0 to row 5
+    int** connect4Board = new int* [6];
+    for(int i=0;i<6;i++)
+	{
+		connect4Board[i] = new int[7];
+	}
+
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < 7; j++)
+		{
+			connect4Board[i][j]=0;
+		}
+	}
+
+	return connect4Board;
+}
+
+void SaveGame(int** board)
+{
+	std::ofstream outfile;
+	outfile.open("LastGame.txt");
+	for(int i=0;i<6;i++)
+    {
+        for(int j=0;j<7;j++)
+		{
+			outfile << board[i][j] << std::endl;
+		}
+	}
+	outfile.close();
+}
+
+int** LoadGame()
+{
+	int** board=InitiateBoard();
+	std::ifstream infile;
+	infile.open("LastGame.txt");
+	for(int i=0;i<6;i++)
+    {
+        for(int j=0;j<7;j++)
+		{
+			infile >> board[i][j];
+		}
+	}
+	infile.close();
+	return board;
 }
